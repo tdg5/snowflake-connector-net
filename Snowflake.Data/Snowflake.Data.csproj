@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1</TargetFrameworks>
     <Title>Seismic.Snowflake.Data</Title>
     <PackageId>Seismic.Snowflake.Data</PackageId>
     <PackageLicenseUrl>https://github.com/snowflakedb/snowflake-connector-net/blob/master/LICENSE</PackageLicenseUrl>
@@ -12,7 +12,7 @@
     <Product>Snowflake Connector for .NET</Product>
     <Authors>howryu, tchen</Authors>
     <Copyright>Copyright (c) 2012-2019 Snowflake Computing Inc. All rights reserved.</Copyright>
-    <Version>1.1.2.2</Version>
+    <Version>1.1.2.3</Version>
     <DebugType>Full</DebugType>
   </PropertyGroup>
 	
@@ -22,8 +22,8 @@
     <PackageReference Include="log4net" Version="2.0.8" />
   </ItemGroup>
   
-  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.5.0" />
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
   </ItemGroup>
   
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
