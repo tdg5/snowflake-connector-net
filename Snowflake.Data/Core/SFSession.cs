@@ -149,6 +149,12 @@ namespace Snowflake.Data.Core
 
         internal void close()
         {
+          var task = Task.Run(async () => await closeAsync());
+          task.Wait();
+        }
+
+        internal async Task closeAsync()
+        {
             var queryParams = new Dictionary<string, string>();
             queryParams[RestParams.SF_QUERY_SESSION_DELETE] = "true";
             queryParams[RestParams.SF_QUERY_REQUEST_ID] = Guid.NewGuid().ToString();
@@ -160,7 +166,7 @@ namespace Snowflake.Data.Core
                 authorizationToken = string.Format(SF_AUTHORIZATION_SNOWFLAKE_FMT, sessionToken)
             };
           
-            var response = restRequester.Post<CloseResponse>(closeSessionRequest);
+            var response = await restRequester.PostAsync<CloseResponse>(closeSessionRequest, CancellationToken.None);
             if (!response.success)
             {
                 logger.Debug($"Failed to delete session, error ignored. Code: {response.code} Message: {response.message}");

@@ -87,11 +87,17 @@ namespace Snowflake.Data.Client
 
         public override void Close()
         {
+            var task = Task.Run(async () => await CloseAsync());
+            task.Wait();
+        }
+
+        public async Task CloseAsync()
+        {
             logger.Debug("Close Connection.");
 
             if (_connectionState != ConnectionState.Closed && SfSession != null)
             {
-                SfSession.close();
+                await SfSession.closeAsync();
                 _connectionState = ConnectionState.Closed;
             }
 
@@ -172,6 +178,19 @@ namespace Snowflake.Data.Client
             disposed = true;
 
             base.Dispose(disposing);
+        }
+
+        public override ValueTask DisposeAsync()
+        {
+            return new ValueTask(Task.Run(async () => {
+                if (disposed)
+                    return;
+
+                await this.CloseAsync();
+                disposed = true;
+
+                await base.DisposeAsync();
+            }));
         }
 
         ~SnowflakeDbConnection()
