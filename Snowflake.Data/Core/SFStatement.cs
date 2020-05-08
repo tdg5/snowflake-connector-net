@@ -130,7 +130,6 @@ namespace Snowflake.Data.Core
         {
             if (response.success)
             {
-                CancelTimeoutCallbackRegistration();
                 return new SFResultSet(response.data, this, cancellationToken);
             }
 
@@ -216,6 +215,7 @@ namespace Snowflake.Data.Core
             }
             finally
             {
+                CancelTimeoutCallbackRegistration();
                 ClearQueryRequestId();
             }
         }
@@ -268,6 +268,7 @@ namespace Snowflake.Data.Core
             }
             finally
             {
+                CancelTimeoutCallbackRegistration();
                 ClearQueryRequestId();
             }
         }
