@@ -1,0 +1,15 @@
+#!/bin/bash
+
+if [ -n "$1" ]; then
+  SOURCE="$1"
+else
+  SOURCE="$HOME/.nuget/local-published"
+fi
+
+PROJECT_PATH="Snowflake.Data/Snowflake.Data.csproj"
+VERSION_PREFIX="$(xmllint "$PROJECT_PATH" --xpath "Project/PropertyGroup/VersionPrefix/text()" | xargs)"
+VERSION_SUFFIX="$(xmllint "$PROJECT_PATH" --xpath "Project/PropertyGroup/VersionSuffix/text()" | xargs)"
+VERSION="$VERSION_PREFIX-$VERSION_SUFFIX"
+
+dotnet pack -c Release "$PROJECT_PATH"
+dotnet nuget push --source "$SOURCE" "./Snowflake.Data/bin/Release/Seismic.Snowflake.Data.$VERSION.nupkg"
