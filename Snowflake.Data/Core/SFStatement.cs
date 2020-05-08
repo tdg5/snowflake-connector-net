@@ -35,13 +35,15 @@ namespace Snowflake.Data.Core
 
         private readonly object _requestIdLock = new object();
 
+        private CancellationTokenRegistration _cancelOnTimeoutRegistration;
+
         private readonly IRestRequester _restRequester;
 
         private CancellationTokenSource _timeoutTokenSource;
-        
-        // Merged cancellation token source for all canellation signal. 
+
+        // Merged cancellation token source for all canellation signal.
         // Cancel callback will be registered under token issued by this source.
-        private CancellationTokenSource _linkedCancellationTokenSouce;
+        private CancellationTokenSource _linkedCancellationTokenSource;
 
         internal SFStatement(SFSession session, IRestRequester rest)
         {
@@ -56,7 +58,7 @@ namespace Snowflake.Data.Core
         {
             lock (_requestIdLock)
             {
-                
+
                 if (_requestId != null)
                 {
                     logger.Info("Another query is running.");
@@ -117,10 +119,18 @@ namespace Snowflake.Data.Core
             };
         }
 
+        private void CancelTimeoutCallbackRegistration()
+        {
+            if (_linkedCancellationTokenSource != null && _cancelOnTimeoutRegistration.Token == _linkedCancellationTokenSource.Token) {
+                _cancelOnTimeoutRegistration.Unregister();
+            }
+        }
+
         private SFBaseResultSet BuildResultSet(QueryExecResponse response, CancellationToken cancellationToken)
         {
             if (response.success)
             {
+                CancelTimeoutCallbackRegistration();
                 return new SFResultSet(response.data, this, cancellationToken);
             }
 
@@ -133,7 +143,7 @@ namespace Snowflake.Data.Core
             this._timeoutTokenSource = timeout > 0 ? new CancellationTokenSource(timeout * 1000) :
                                                      new CancellationTokenSource(Timeout.InfiniteTimeSpan);
         }
-        
+
         /// <summary>
         ///     Register cancel callback. Two factors: either external cancellation token passed down from upper
         ///     layer or timeout reached. Whichever comes first would trigger query cancellation.
@@ -143,11 +153,11 @@ namespace Snowflake.Data.Core
         private void registerQueryCancellationCallback(int timeout, CancellationToken externalCancellationToken)
         {
             SetTimeout(timeout);
-            _linkedCancellationTokenSouce = CancellationTokenSource.CreateLinkedTokenSource(_timeoutTokenSource.Token,
+            _linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(_timeoutTokenSource.Token,
                 externalCancellationToken);
-            if (!_linkedCancellationTokenSouce.IsCancellationRequested)
+            if (!_linkedCancellationTokenSource.IsCancellationRequested)
             {
-                _linkedCancellationTokenSouce.Token.Register(() => Cancel(false));
+                _cancelOnTimeoutRegistration = _linkedCancellationTokenSource.Token.Register(() => Cancel(false));
             }
         }
 
@@ -209,7 +219,7 @@ namespace Snowflake.Data.Core
                 ClearQueryRequestId();
             }
         }
-        
+
         internal SFBaseResultSet Execute(int timeout, string sql, Dictionary<string, BindingDTO> bindings, bool describeOnly)
         {
             registerQueryCancellationCallback(timeout, CancellationToken.None);
@@ -288,12 +298,15 @@ namespace Snowflake.Data.Core
                 };
             }
         }
-        
+
         internal void Cancel(bool throwOnFailure = true)
         {
             SFRestRequest request = BuildCancelQueryRequest();
             if (request == null)
+            {
+                CancelTimeoutCallbackRegistration();
                 return;
+            }
 
             try {
                 var response = _restRequester.Post<NullDataResponse>(request);
@@ -312,6 +325,7 @@ namespace Snowflake.Data.Core
                         throw e;
                     }
                 }
+                CancelTimeoutCallbackRegistration();
             }
             catch (Exception e)
             {
@@ -322,6 +336,6 @@ namespace Snowflake.Data.Core
                 }
             }
         }
-        
+
     }
 }
