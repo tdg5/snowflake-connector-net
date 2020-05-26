@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1</TargetFrameworks>
     <Title>Snowflake.Data.Tests</Title>
     <Description>Snowflake Connector for .NET</Description>
     <Company>Snowflake Computing, Inc</Company>
     <Product>Snowflake Connector for .NET</Product>
     <Copyright>Copyright (c) 2012-2018 Snowflake Computing Inc. All rights reserved.</Copyright>
   </PropertyGroup>
-	
+
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.1.0" />
@@ -16,15 +16,12 @@
     <ProjectReference Include="..\Snowflake.Data\Snowflake.Data.csproj" />
   </ItemGroup>
   <Target Name="CopyCustomContent" AfterTargets="AfterBuild">
-    <Copy SourceFiles="parameters.json" DestinationFolder="$(OutDir)" />
-	<Copy SourceFiles="parameters_gcp.json" DestinationFolder="$(OutDir)" />
     <Copy SourceFiles="App.config" DestinationFolder="$(OutDir)" />
   </Target>
   <ItemGroup>
     <Folder Include="Properties\" />
   </ItemGroup>
-  
-  
+
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DebugType>full</DebugType>
     <DebugSymbols>True</DebugSymbols>

@@ -79,24 +79,35 @@ namespace Snowflake.Data.Tests
             log4net.GlobalContext.Properties["framework"] = "netcoreapp2.0";
             var logRepository = log4net.LogManager.GetRepository(Assembly.GetEntryAssembly());
             log4net.Config.XmlConfigurator.Configure(logRepository, new FileInfo("App.config"));
-            String cloud = Environment.GetEnvironmentVariable("snowflake_cloud_env");
+            var cloud = Environment.GetEnvironmentVariable("SNOWFLAKE_TEST_CLOUD_ENV");
             Assert.IsTrue(cloud == null || cloud == "AWS" || cloud == "AZURE" || cloud == "GCP", "{0} is not supported. Specify AWS, AZURE or GCP as cloud environment", cloud);
 
-            StreamReader reader;
-            if (cloud != null && cloud.Equals("GCP"))
-            {
-                reader = new StreamReader("parameters_gcp.json");
-            }
-            else
-            {
-                reader = new StreamReader("parameters.json");
-            }
+            var account = Environment.GetEnvironmentVariable("SNOWFLAKE_TEST_ACCOUNT");
+            var database = Environment.GetEnvironmentVariable("SNOWFLAKE_TEST_DATABASE");
+            var host = Environment.GetEnvironmentVariable("SNOWFLAKE_TEST_HOST");
+            var password = Environment.GetEnvironmentVariable("SNOWFLAKE_TEST_PASSWORD");
+            var role = Environment.GetEnvironmentVariable("SNOWFLAKE_TEST_ROLE");
+            var schema = Environment.GetEnvironmentVariable("SNOWFLAKE_TEST_SCHEMA");
+            var user = Environment.GetEnvironmentVariable("SNOWFLAKE_TEST_USER");
+            var warehouse = Environment.GetEnvironmentVariable("SNOWFLAKE_TEST_WAREHOUSE");
 
-            var testConfigString = reader.ReadToEnd();
-           
-            Dictionary<string, TestConfig> testConfigs = JsonConvert.DeserializeObject<Dictionary<string, TestConfig>>(testConfigString);
+            var testConfigs = new Dictionary<string, TestConfig> {
+                {
+                    "AZURE",
+                    new TestConfig() {
+                        account = account,
+                        database = database,
+                        host = host,
+                        password = password,
+                        role = role,
+                        schema = schema,
+                        user = user,
+                        warehouse = warehouse
+                    }
+                }
+            };
 
-            // get key of connection json. Default to "testconnection". If snowflake_cloud_env is specified, use that value as key to
+            // get key of connection. Default to "testconnection". If snowflake_cloud_env is specified, use that value as key to
             // find connection object
             String connectionKey = cloud == null ? "testconnection" : cloud;
 
@@ -107,50 +118,37 @@ namespace Snowflake.Data.Tests
             }
             else
             {
-                Assert.Fail("Failed to load test configuration");
+                Assert.Fail($"Failed to load test configuration");
             }
         }
     }
 
     public class TestConfig
     {
-        [JsonProperty(PropertyName = "SNOWFLAKE_TEST_USER", NullValueHandling = NullValueHandling.Ignore)]
         internal string user { get; set; }
 
-        [JsonProperty(PropertyName = "SNOWFLAKE_TEST_PASSWORD", NullValueHandling = NullValueHandling.Ignore)]
         internal string password { get; set; }
 
-        [JsonProperty(PropertyName = "SNOWFLAKE_TEST_ACCOUNT", NullValueHandling = NullValueHandling.Ignore)]
         internal string account { get; set; }
 
-        [JsonProperty(PropertyName = "SNOWFLAKE_TEST_HOST", NullValueHandling = NullValueHandling.Ignore)]
         internal string host { get; set; }
 
-        [JsonProperty(PropertyName = "SNOWFLAKE_TEST_PORT", NullValueHandling = NullValueHandling.Ignore)]
         internal string port { get; set; }
 
-        [JsonProperty(PropertyName = "SNOWFLAKE_TEST_WAREHOUSE", NullValueHandling = NullValueHandling.Ignore)]
         internal string warehouse { get; set; }
 
-        [JsonProperty(PropertyName = "SNOWFLAKE_TEST_DATABASE", NullValueHandling = NullValueHandling.Ignore)]
         internal string database { get; set; }
 
-        [JsonProperty(PropertyName = "SNOWFLAKE_TEST_SCHEMA", NullValueHandling = NullValueHandling.Ignore)]
         internal string schema { get; set; }
 
-        [JsonProperty(PropertyName = "SNOWFLAKE_TEST_ROLE", NullValueHandling = NullValueHandling.Ignore)]
         internal string role { get; set; }
 
-        [JsonProperty(PropertyName = "SNOWFLAKE_TEST_PROTOCOL", NullValueHandling = NullValueHandling.Ignore)]
         internal string protocol { get; set; }
 
-        [JsonProperty(PropertyName = "SNOWFLAKE_TEST_OKTA_USER", NullValueHandling = NullValueHandling.Ignore)]
         internal string OktaUser { get; set; }
 
-        [JsonProperty(PropertyName = "SNOWFLAKE_TEST_OKTA_PASSWORD", NullValueHandling = NullValueHandling.Ignore)]
         internal string OktaPassword { get; set; }
 
-        [JsonProperty(PropertyName = "SNOWFLAKE_TEST_OKTA_URL", NullValueHandling = NullValueHandling.Ignore)]
         internal string OktaURL { get; set; }
 
         public TestConfig()

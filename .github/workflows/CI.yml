@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - Snowflake.Data*/**
+      - snowflake-connector-net.sln
+  pull_request:
+    branches:
+      - master
+    paths:
+      - Snowflake.Data*/**
+      - snowflake-connector-net.sln
+
+jobs:
+  nuget_publish_job:
+    if: "!contains(github.event.commits[0].message, '[GitHub Action]')"
+    runs-on: ubuntu-latest
+    name: Builds, tests, and publishes to JFrog. Will only publish from master.
+    steps:
+      - name: Checkout disc-snowflake-connector-net
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.PAT }}
+          path: disc-snowflake-connector-net
+      - name: Checkout seismic-github-actions
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.PAT }}
+          repository: seismic/github-actions
+          path: seismic-github-actions
+          ref: nuget-publish-action/1.0.0
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+      - name: Build, test, and publish step
+        env:
+          SNOWFLAKE_TEST_ACCOUNT: "seismicdev"
+          SNOWFLAKE_TEST_CLOUD_ENV: "AZURE"
+          SNOWFLAKE_TEST_DATABASE: "snowflake_connector_net_test"
+          SNOWFLAKE_TEST_HOST: "seismicdev.east-us-2.azure.snowflakecomputing.com"
+          SNOWFLAKE_TEST_PASSWORD: "${{ secrets.SNOWFLAKE_TEST_PASSWORD }}"
+          SNOWFLAKE_TEST_ROLE: "snowflake_connector_net_test"
+          SNOWFLAKE_TEST_SCHEMA: "snowflake_connector_net_test"
+          SNOWFLAKE_TEST_USER: "snowflake_connector_net_test"
+          SNOWFLAKE_TEST_WAREHOUSE: "poke_around"
+        uses: ./seismic-github-actions/actions/packages/nuget-publish-action/lib
+        with:
+          checkout-path: disc-snowflake-connector-net
+          pkg-version: pkg.version
+          nuget-source: https://seismic.jfrog.io/seismic/api/nuget/nuget-local
+          nuget-source-directory: Common
+          nuget-username: arosenfeld@seismic.com
+          nuget-cleartext-password: ${{ secrets.NUGET_CLEARTEXT_PASSWORD }}
