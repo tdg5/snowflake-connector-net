@@ -13,7 +13,7 @@
     <Authors>howryu, tchen</Authors>
     <Copyright>Copyright (c) 2012-2019 Snowflake Computing Inc. All rights reserved.</Copyright>
     <VersionPrefix>1.1.2</VersionPrefix>
-    <VersionSuffix>5</VersionSuffix>
+    <VersionSuffix>6</VersionSuffix>
     <DebugType>Full</DebugType>
   </PropertyGroup>
 
