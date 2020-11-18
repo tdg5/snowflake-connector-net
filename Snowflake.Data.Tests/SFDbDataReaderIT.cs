@@ -185,7 +185,6 @@ namespace Snowflake.Data.Tests
             testGetDateAndOrTime(inputTimeStr, null, SFDataType.DATE);
         }
 
-
         [Test]
         [TestCase(null, null)]
         [TestCase(null, 3)]
