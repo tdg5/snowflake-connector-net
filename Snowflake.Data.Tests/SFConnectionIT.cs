@@ -184,8 +184,7 @@ namespace Snowflake.Data.Tests
         }
 
         [Test]
-        [IgnoreOnEnvIs("snowflake_cloud_env", 
-                       new string[]{"AZURE", "GCP"})]
+        [Ignore("This test uses a SNOWFLAKE_SAMPLE_DATA db which we don't have. Also shouldn't run for azure anyway.")]
         public void TestSwitchDb()
         {
             using (IDbConnection conn = new SnowflakeDbConnection())
