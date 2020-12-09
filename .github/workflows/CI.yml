@@ -6,6 +6,7 @@ on:
       - master
     paths:
       - Snowflake.Data*/**
+      - pkg.version
       - snowflake-connector-net.sln
   pull_request:
     branches:
