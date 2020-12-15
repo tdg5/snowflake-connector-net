@@ -184,7 +184,6 @@ namespace Snowflake.Data.Tests
         }
 
         [Test]
-        [Ignore("This test uses a SNOWFLAKE_SAMPLE_DATA db which we don't have. Also shouldn't run for azure anyway.")]
         public void TestSwitchDb()
         {
             using (IDbConnection conn = new SnowflakeDbConnection())
@@ -198,8 +197,8 @@ namespace Snowflake.Data.Tests
                 Assert.AreEqual(testConfig.database.ToUpper(), conn.Database);
                 Assert.AreEqual(conn.State, ConnectionState.Open);
 
-                conn.ChangeDatabase("SNOWFLAKE_SAMPLE_DATA");
-                Assert.AreEqual("SNOWFLAKE_SAMPLE_DATA", conn.Database);
+                conn.ChangeDatabase("SNOWFLAKE_CONNECTOR_NET_TEST_2");
+                Assert.AreEqual("SNOWFLAKE_CONNECTOR_NET_TEST_2", conn.Database);
 
                 conn.Close();
             }
@@ -236,7 +235,7 @@ namespace Snowflake.Data.Tests
                 }
 
                 string connStrFmt = "scheme={0};host={1};port={2};" +
-                    "user={3};password={4};account={5};role=public;db=snowflake_sample_data;schema=information_schema;warehouse=WH_NOT_EXISTED;validate_default_parameters=false";
+                    "user={3};password={4};account={5};role=public;db=SNOWFLAKE_CONNECTOR_NET_TEST;schema=information_schema;warehouse=WH_NOT_EXISTED;validate_default_parameters=false";
 
                 conn.ConnectionString = string.Format(
                     connStrFmt,
@@ -256,7 +255,7 @@ namespace Snowflake.Data.Tests
                     Assert.AreEqual(command.ExecuteScalar().ToString(), "PUBLIC");
 
                     command.CommandText = "select current_database()";
-                    CollectionAssert.Contains(new [] { "SNOWFLAKE_SAMPLE_DATA", "" }, command.ExecuteScalar().ToString());
+                    CollectionAssert.Contains(new [] { "SNOWFLAKE_CONNECTOR_NET_TEST", "" }, command.ExecuteScalar().ToString());
 
                     command.CommandText = "select current_schema()";
                     CollectionAssert.Contains(new [] { "INFORMATION_SCHEMA", "" }, command.ExecuteScalar().ToString());
