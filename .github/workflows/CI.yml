@@ -52,5 +52,5 @@ jobs:
           pkg-version: pkg.version
           nuget-source: https://seismic.jfrog.io/seismic/api/nuget/nuget-local
           nuget-source-directory: Common
-          nuget-username: arosenfeld@seismic.com
+          nuget-username: disc-publish
           nuget-cleartext-password: ${{ secrets.NUGET_CLEARTEXT_PASSWORD }}
