@@ -17,9 +17,8 @@ on:
 
 jobs:
   nuget_publish_job:
-    if: "!contains(github.event.commits[0].message, '[GitHub Action]')"
     runs-on: ubuntu-latest
-    name: Builds, tests, and publishes to JFrog. Will only publish from master.
+    name: Builds, tests, and publishes on merge to JFrog.
     steps:
       - name: Checkout disc-snowflake-connector-net
         uses: actions/checkout@v2
@@ -32,7 +31,7 @@ jobs:
           token: ${{ secrets.PAT }}
           repository: seismic/github-actions
           path: seismic-github-actions
-          ref: nuget-publish-action/1.0.0
+          ref: nuget-publish-action/1.0.1
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v1
       - name: Build, test, and publish step
