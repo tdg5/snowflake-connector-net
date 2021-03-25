@@ -3,14 +3,14 @@ name: CI
 on:
   push:
     branches:
-      - master
+      - "dannyg/toy-with-cancellation-token-sources"
     paths:
       - Snowflake.Data*/**
       - pkg.version
       - snowflake-connector-net.sln
   pull_request:
     branches:
-      - master
+      - "dannyg/toy-with-cancellation-token-sources"
     paths:
       - Snowflake.Data*/**
       - snowflake-connector-net.sln

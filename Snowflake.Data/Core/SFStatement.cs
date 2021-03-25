@@ -126,6 +126,12 @@ namespace Snowflake.Data.Core
                 // https://github.com/microsoft/referencesource/blob/f461f1986ca4027720656a0c77bede9963e20b7e/Microsoft.Bcl/System.Threading.Tasks.v1.5/System/Threading/CancellationTokenRegistration.cs#L18
                 _cancelOnTimeoutRegistration.Dispose();
             }
+            if (_linkedCancellationTokenSource != null) {
+                _linkedCancellationTokenSource.Dispose();
+            }
+            if (_timeoutTokenSource != null) {
+                _timeoutTokenSource.Dispose();
+            }
         }
 
         private SFBaseResultSet BuildResultSet(QueryExecResponse response, CancellationToken cancellationToken)
